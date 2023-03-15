@@ -16,6 +16,9 @@ const routes = [
       path: "/pk/",
       name: "pk_index",
       component: PkIndexView,
+      meta:{
+        title: '首页'
+      }
     },
     {
       path: "/record/",
@@ -47,5 +50,6 @@ const router = createRouter({
   history: createWebHistory(),
   routes
 })
+
 
 export default router
