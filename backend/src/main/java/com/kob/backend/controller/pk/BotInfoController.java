@@ -22,7 +22,7 @@ public class BotInfoController {
      * @author: fangshaolei
      * @time: 2023/3/15 20:02
      */
-    @RequestMapping("getbotinfo/")
+    @RequestMapping("getbotinfo")
     public Map<String, String> getBotInfo(){
         Map<String, String> bot1 = new HashMap<>();
         bot1.put("name", "fangshaolei");
