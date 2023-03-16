@@ -3,6 +3,8 @@ package com.kob.backend.controller.user;
 import com.kob.backend.mapper.UserMapper;
 import com.kob.backend.pojo.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -58,7 +60,10 @@ public class UserController {
     ){
         User user = new User();
         user.setUserName(userName);
-        user.setPassWord(passWord);
+        // 加密密码
+        PasswordEncoder encoder = new BCryptPasswordEncoder();
+        String encodePassword = encoder.encode(passWord);
+        user.setPassWord(encodePassword);
         int insert = userMapper.insert(user);
         if(insert > 0) return "success";
         return "fail";
