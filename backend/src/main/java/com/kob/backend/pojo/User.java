@@ -36,4 +36,10 @@ public class User {
      */
     @TableField("password")
     private String passWord;
+
+    /**
+     * 用户头像
+     */
+    @TableField("avatar")
+    private String avatar;
 }
