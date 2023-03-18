@@ -82,7 +82,7 @@ public class AccountServiceImpl implements AccountService {
     }
     
     /**
-     * @description: 
+     * @description: 注册用户
      * @param username
      * @param password
      * @param confirmedPassword
@@ -141,7 +141,7 @@ public class AccountServiceImpl implements AccountService {
         User user = new User(null, username, encodedPassword, avatar);
         userMapper.insert(user);
 
-        map.put("error_message", "成功了");
+        map.put("error_message", "success");
         return map;
     }
 }
