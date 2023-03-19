@@ -66,6 +66,7 @@ export default {
           confirmedPassword: confirmedPassword.value,
         },
         success(resp) {
+          console.log(resp);
           if (resp.error_message === "success") {
             router.push({ name: "user_account_login" });
           } else {
