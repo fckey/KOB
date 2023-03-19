@@ -2,7 +2,6 @@
   <NavBar />
   <router-view />
 </template>
-
 <script>
 import NavBar from "./components/NarBar.vue";
 import "bootstrap/dist/css/bootstrap.min.css";
