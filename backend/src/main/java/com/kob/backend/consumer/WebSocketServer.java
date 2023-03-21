@@ -3,6 +3,7 @@ package com.kob.backend.consumer;
 import com.alibaba.fastjson2.JSONObject;
 import com.kob.backend.consumer.utils.Game;
 import com.kob.backend.consumer.utils.JwtAuthenticationUtil;
+import com.kob.backend.mapper.RecordMapper;
 import com.kob.backend.mapper.UserMapper;
 import com.kob.backend.pojo.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Component
 @ServerEndpoint("/websocket/{token}")  // 注意不要以'/'结尾
 public class WebSocketServer {
-    final private static ConcurrentHashMap<Integer, WebSocketServer> users = new ConcurrentHashMap<>(); // 存储所有的链接
+    final public static ConcurrentHashMap<Integer, WebSocketServer> users = new ConcurrentHashMap<>(); // 存储所有的链接
 
     final private  static CopyOnWriteArrayList<User> matchpool = new CopyOnWriteArrayList<>(); // 匹配池
     private Session session = null;
@@ -32,11 +33,17 @@ public class WebSocketServer {
 
     // 注入数据库操作
     private static UserMapper userMapper;
+    public static RecordMapper recordMapper;
 
+    private Game game = null;
 
     @Autowired
     public void setUserMapper(UserMapper userMapper){
         WebSocketServer.userMapper = userMapper;
+    }
+    @Autowired
+    public void setRecordMapper(RecordMapper recordMapper){
+        WebSocketServer.recordMapper = recordMapper;
     }
     @OnOpen
     public void onOpen(Session session, @PathParam("token") String token) throws IOException {
@@ -64,6 +71,14 @@ public class WebSocketServer {
         }
     }
 
+    private void move(int direction){
+        // 判断一下当前是哪条蛇
+        if(game.getPlayerA().getId().equals(user.getId())){
+            game.setNextStepA(direction);
+        }else if(game.getPlayerB().getId().equals(user.getId())){
+            game.setNextStepB(direction);
+        }
+    }
     @OnMessage
     public void onMessage(String message, Session session) {
         // 从Client接收消息
@@ -74,6 +89,9 @@ public class WebSocketServer {
             startMatching();
         }else if("stop-matching".equals(event)){
             stopMatching();
+        }else if("move".equals(event)){
+            System.out.println(event);
+            move(data.getInteger("direction"));
         }
     }
 
@@ -88,8 +106,12 @@ public class WebSocketServer {
             matchpool.remove(a);
             matchpool.remove(b);
 
-            Game game = new Game(27, 28, 29);
+            Game game = new Game(14, 13, 16, a.getId(), b.getId());
             game.createMap();
+            users.get(a.getId()).game = game;
+            users.get(b.getId()).game = game;
+
+            game.start(); // 开启一个新的线程
 
             JSONObject respA = new JSONObject();
             respA.put("event", "start-matching");

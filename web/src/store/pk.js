@@ -4,8 +4,9 @@ export default{
         socket: null,
         opponent_username: '',
         opponent_avatar: '',
-        game: ''
-
+        game: '',
+        gameObject: '',
+        loser: 'none', // all ， a、b
     },
     getters: {
     },
@@ -22,7 +23,13 @@ export default{
         },
         updateGame(state, game){
             state.game = game;
-        }
+        },
+        updateGameObject(state, gameObject){
+            state.gameObject = gameObject;
+        },
+        updateLoser(state, loser){
+            state.loser = loser;
+        },
     },
     actions: {
     },

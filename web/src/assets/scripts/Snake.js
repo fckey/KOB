@@ -2,7 +2,7 @@
  * @Author: fangshaolei 
  * @Date: 2023-03-16 08:42:27 
  * @Last Modified by: fangshaolei
- * @Last Modified time: 2023-03-17 09:14:01
+ * @Last Modified time: 2023-03-21 13:41:19
  * @Description: 游戏的地图渲染
  */
 
@@ -80,10 +80,6 @@ export class Snake extends AcGameObject{
         const k = this.cells.length;
         for(let i = k; i > 0; i --){
             this.cells[i] = JSON.parse(JSON.stringify(this.cells[i - 1]));
-        }
-
-        if(!this.gamemap.check_valid(this.next_cell)){ // 下一步操作已经撞了，蛇去世
-            this.status = "die";
         }
     }
     
