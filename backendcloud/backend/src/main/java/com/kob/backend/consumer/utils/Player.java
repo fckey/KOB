@@ -40,18 +40,19 @@ public class Player {
      * @author: fangshaolei
      * @time: 2023/3/21 14:03
      */
-    public List<Cell> getCells(){
-        List<Cell> res = new ArrayList<>();
 
+
+    public List<Cell> getCells() {
+        List<Cell> res = new ArrayList<>();
         int[] dx = {-1, 0, 1, 0}, dy = {0, 1, 0, -1};
         int x = sx, y = sy;
         int step = 0;
         res.add(new Cell(x, y));
-        for(int d: steps){
+        for (int d : steps) {
             x += dx[d];
             y += dy[d];
             res.add(new Cell(x, y));
-            if(!checkTailIncreasing(++step)){
+            if (!checkTailIncreasing(++ step)) {   // 这里是不增加长度时才要移除尾巴
                 res.remove(0);
             }
         }

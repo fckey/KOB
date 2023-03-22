@@ -8,6 +8,7 @@ import com.kob.backend.mapper.UserMapper;
 import com.kob.backend.pojo.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
@@ -26,14 +27,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @ServerEndpoint("/websocket/{token}")  // 注意不要以'/'结尾
 public class WebSocketServer {
     final public static ConcurrentHashMap<Integer, WebSocketServer> users = new ConcurrentHashMap<>(); // 存储所有的链接
-
-    final private  static CopyOnWriteArrayList<User> matchpool = new CopyOnWriteArrayList<>(); // 匹配池
     private Session session = null;
     private User user;
 
     // 注入数据库操作
     private static UserMapper userMapper;
     public static RecordMapper recordMapper;
+
+    public static RestTemplate restTemplate;
 
     private Game game = null;
 
@@ -45,6 +46,11 @@ public class WebSocketServer {
     public void setRecordMapper(RecordMapper recordMapper){
         WebSocketServer.recordMapper = recordMapper;
     }
+    @Autowired
+    public void setRestTemplate(RestTemplate restTemplate){
+        WebSocketServer.restTemplate = restTemplate;
+    }
+
     @OnOpen
     public void onOpen(Session session, @PathParam("token") String token) throws IOException {
         // 建立连接
@@ -67,7 +73,6 @@ public class WebSocketServer {
         System.out.println("disconnnected");
         if(this.user != null){
             users.remove(this.user.getId());
-            matchpool.remove(this.user);
         }
     }
 
@@ -95,43 +100,38 @@ public class WebSocketServer {
         }
     }
 
+    private void startGame(Integer aId, Integer bId){
+        User a = userMapper.selectById(aId), b = userMapper.selectById(bId);
+        Game game = new Game(14, 13, 16, a.getId(), b.getId());
+        game.createMap();
+        users.get(a.getId()).game = game;
+        users.get(b.getId()).game = game;
+
+        game.start(); // 开启一个新的线程
+
+        JSONObject respA = new JSONObject();
+        respA.put("event", "start-matching");
+        respA.put("opponent_username", b.getUserName());
+        respA.put("opponent_avatar", b.getAvatar());
+        respA.put("game", game);
+        users.get(a.getId()).sendMessage(respA.toJSONString());
+
+        JSONObject respB = new JSONObject();
+        respB.put("event", "start-matching");
+        respB.put("opponent_username", a.getUserName());
+        respB.put("opponent_avatar", a.getAvatar());
+        respB.put("game", game);
+        users.get(b.getId()).sendMessage(respB.toJSONString());
+    }
+
     private void startMatching(){
         System.out.println("start matching");
-        matchpool.add(this.user);
 
-        while(matchpool.size() >= 2){
-            Iterator<User> it = matchpool.iterator();
-            User a = it.next();
-            User b = it.next();
-            matchpool.remove(a);
-            matchpool.remove(b);
-
-            Game game = new Game(14, 13, 16, a.getId(), b.getId());
-            game.createMap();
-            users.get(a.getId()).game = game;
-            users.get(b.getId()).game = game;
-
-            game.start(); // 开启一个新的线程
-
-            JSONObject respA = new JSONObject();
-            respA.put("event", "start-matching");
-            respA.put("opponent_username", b.getUserName());
-            respA.put("opponent_avatar", b.getAvatar());
-            respA.put("game", game);
-            users.get(a.getId()).sendMessage(respA.toJSONString());
-
-            JSONObject respB = new JSONObject();
-            respB.put("event", "start-matching");
-            respB.put("opponent_username", a.getUserName());
-            respB.put("opponent_avatar", a.getAvatar());
-            respB.put("game", game);
-            users.get(b.getId()).sendMessage(respB.toJSONString());
-
-        }
     }
+
+
     private void stopMatching(){
         System.out.println("stop matching");
-        matchpool.remove(this.user);
     }
 
     @OnError
