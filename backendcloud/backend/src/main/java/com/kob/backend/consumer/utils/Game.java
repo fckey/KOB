@@ -240,8 +240,12 @@ public class Game extends Thread{
         sendAllMessage(resp.toJSONString());
     }
     private void sendAllMessage(String message){
-        WebSocketServer.users.get(playerA.getId()).sendMessage(message);
-        WebSocketServer.users.get(playerB.getId()).sendMessage(message);
+        if( WebSocketServer.users.get(playerA.getId()) != null){
+            WebSocketServer.users.get(playerA.getId()).sendMessage(message);
+        }
+        if(WebSocketServer.users.get(playerB.getId()) != null){
+            WebSocketServer.users.get(playerB.getId()).sendMessage(message);
+        }
     }
 
     private boolean check_valid(List<Cell> cellsA, List<Cell> cellsB){

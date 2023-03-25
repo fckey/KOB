@@ -26,6 +26,10 @@ public class User {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
     /**
+     *  bot的分数
+     */
+    private Integer rating;
+    /**
      * 用户名
      */
     @TableField("username")

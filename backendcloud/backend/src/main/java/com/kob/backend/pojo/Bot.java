@@ -45,10 +45,7 @@ public class Bot {
      * bot的内容
      */
     private String content;
-    /**
-     *  bot的分数
-     */
-    private Integer rating;
+
 
     /**
      * bot创建的时间

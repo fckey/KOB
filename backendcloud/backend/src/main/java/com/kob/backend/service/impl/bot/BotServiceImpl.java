@@ -63,7 +63,7 @@ public class BotServiceImpl implements BotService {
         }
 
         Date now = new Date();
-        Bot bot = new Bot(null, user.getId(), title, description, content, 1500, now, now);
+        Bot bot = new Bot(null, user.getId(), title, description, content, now, now);
         int insert = botMapper.insert(bot);
         if(insert < 1) map.put("error_message", "插入数据失败");
         else map.put("error_message", "success");
@@ -158,7 +158,6 @@ public class BotServiceImpl implements BotService {
                 title,
                 description,
                 content,
-                bot.getRating(),
                 bot.getCreateTime(),
                 new Date()
         );

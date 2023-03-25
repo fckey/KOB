@@ -8,6 +8,8 @@ import com.kob.backend.mapper.UserMapper;
 import com.kob.backend.pojo.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.websocket.*;
@@ -37,7 +39,8 @@ public class WebSocketServer {
     public static RestTemplate restTemplate;
 
     private Game game = null;
-
+    private final static String addPlayerUrl = "http://127.0.0.1:9001/player/add/";
+    private final static String removePlayerUrl = "http://127.0.0.1:9001/player/remove/";
     @Autowired
     public void setUserMapper(UserMapper userMapper){
         WebSocketServer.userMapper = userMapper;
@@ -100,13 +103,16 @@ public class WebSocketServer {
         }
     }
 
-    private void startGame(Integer aId, Integer bId){
+    public static void startGame(Integer aId, Integer bId){
         User a = userMapper.selectById(aId), b = userMapper.selectById(bId);
         Game game = new Game(14, 13, 16, a.getId(), b.getId());
         game.createMap();
-        users.get(a.getId()).game = game;
-        users.get(b.getId()).game = game;
-
+        if(users.get(a.getId()) != null){
+            users.get(a.getId()).game = game;
+        }
+        if(users.get(b.getId()) != null){
+            users.get(b.getId()).game = game;
+        }
         game.start(); // 开启一个新的线程
 
         JSONObject respA = new JSONObject();
@@ -114,24 +120,34 @@ public class WebSocketServer {
         respA.put("opponent_username", b.getUserName());
         respA.put("opponent_avatar", b.getAvatar());
         respA.put("game", game);
-        users.get(a.getId()).sendMessage(respA.toJSONString());
-
+        if(users.get(a.getId()) != null){
+            users.get(a.getId()).sendMessage(respA.toJSONString());
+        }
         JSONObject respB = new JSONObject();
         respB.put("event", "start-matching");
         respB.put("opponent_username", a.getUserName());
         respB.put("opponent_avatar", a.getAvatar());
         respB.put("game", game);
-        users.get(b.getId()).sendMessage(respB.toJSONString());
+        if(users.get(b.getId()) != null){
+            users.get(b.getId()).sendMessage(respB.toJSONString());
+        }
     }
 
     private void startMatching(){
         System.out.println("start matching");
-
+        MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
+        data.add("user_id", this.user.getId().toString());
+        data.add("rating", this.user.getRating().toString());
+        // 第三个参数是返回的类型
+        restTemplate.postForObject(addPlayerUrl, data, String.class);
     }
 
 
     private void stopMatching(){
         System.out.println("stop matching");
+        MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
+        data.add("user_id", this.user.getId().toString());
+        restTemplate.postForObject(removePlayerUrl, data, String.class);
     }
 
     @OnError

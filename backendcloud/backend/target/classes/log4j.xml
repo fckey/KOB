@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+    <appender name="log.console" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{HH:mm:ss,SS} %-5p (%C{1}:%M) - %m%n"/>
+        </layout>
+        <!--过滤器设置输出的级别-->
+        <filter class="org.apache.log4j.varia.LevelRangeFilter">
+            <!-- 设置日志输出的最小级别 -->
+            <param name="levelMin" value="WARN" />
+            <!-- 设置日志输出的最大级别 -->
+            <param name="levelMax" value="ERROR" />
+            <!-- 设置日志输出的xxx，默认是false -->
+            <param name="AcceptOnMatch" value="true" />
+        </filter>
+    </appender>
+    <appender name="log.file" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="File" value="D://log33.log"/>
+        <param name="Append" value="true"/>
+        <param name="DatePattern" value="yyyy-MM-dd"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{HH:mm:ss,SS} %-5p (%C{1}:%M) - %m%n"/>
+        </layout>
+        <!--过滤器设置输出的级别-->
+        <filter class="org.apache.log4j.varia.LevelRangeFilter">
+            <!-- 设置日志输出的最小级别 -->
+            <param name="levelMin" value="WARN" />
+            <!-- 设置日志输出的最大级别 -->
+            <param name="levelMax" value="ERROR" />
+            <!-- 设置日志输出的xxx，默认是false -->
+            <param name="AcceptOnMatch" value="true" />
+        </filter>
+    </appender>
+
+    <!-- com.isoftstone包下的文件日志，级别为info 且根据name为log.console和 log.file两个appender输出-->
+    <logger name="com.isoftstone" additivity="false">
+        <level value="info"/>
+        <appender-ref ref="log.console"/>
+        <appender-ref ref="log.file"/>
+    </logger>
+
+    <!-- com.isoftstone.dao包下的文件日志，级别为error 且根据name为log.console和 log.file两个appender输出-->
+    <logger name="com.isoftstone.dao" additivity="false">
+        <level value="error"/>
+        <appender-ref ref="log.console"/>
+        <appender-ref ref="log.file"/>
+    </logger>
+
+    <!-- 默认配置，级别为debug 且根据name为log.console和 log.file两个appender输出-->
+    <root>
+        <level value="debug"/>
+        <appender-ref ref="log.console"/>
+        <appender-ref ref="log.file"/>
+    </root>
+</log4j:configuration>

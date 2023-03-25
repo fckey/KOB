@@ -138,7 +138,7 @@ public class AccountServiceImpl implements AccountService {
 
         String encodedPassword = passwordEncoder.encode(password);
         String avatar = "https://git.acwing.com/uploads/-/system/user/avatar/290/avatar.png?width=400";
-        User user = new User(null, username, encodedPassword, avatar);
+        User user = new User(null,1500, username, encodedPassword, avatar);
         userMapper.insert(user);
 
         map.put("error_message", "success");
