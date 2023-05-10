@@ -8,40 +8,45 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @description: 定义玩家，记录下每一个玩家的起点坐标和中途经过的位置
- * @author: fangshaolei
- * @time: 2023/3/20 14:18
- */
-
+ * @version 1.0
+ * @program: backendcloud
+ * @classname 定义玩家类，记录下每一个玩家的id，起点坐标
+ * @description: None
+ * @author: Jeff Fong
+ * @create: 2023/05/10 19:52
+ **/
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Player {
+    // 当前玩家的id
     private Integer id;
+    // 当前玩家的x坐标
     private Integer sx;
+    // 当前玩家的y坐标
     private Integer sy;
+    // 玩家历史上走过的方向上的序列， 存的是上下左右四个方向的其中一个
     private List<Integer>  steps;
-    
+
     /**
-     * @description: 动态的判断当前回合蛇的长度是否应该增加
-     * @param steps
-     * @return: boolean
-     * @author: fangshaolei
-     * @time: 2023/3/21 14:03
-     */
+     * @author Jeff Fong
+     * @description 动态的判断当前回合蛇的长度是否应该增加
+     * @date 2023/5/10 21:47
+     * @param: steps
+     * @return boolean
+     **/
     private boolean checkTailIncreasing(int steps){ // 检验当前回合，蛇的长度是否增加
         if(steps <= 10) return false;
         return steps % 3 == 1;
     }
-    /*
-     * @description: 获取身体动态的进行计算
-     * @param
-     * @return: java.util.List<com.kob.backend.consumer.utils.Cell>
-     * @author: fangshaolei
-     * @time: 2023/3/21 14:03
-     */
 
-
+    /**
+     * @author Jeff Fong
+     * @description 已经记录下了从开始到现在所有方向的变化，所以可以动态的计算出当前蛇的所有身体单元
+     * @date 2023/5/10 21:45
+     * @param:
+     * @return java.util.List<com.kob.backend.consumer.utils.Cell>
+     **/
     public List<Cell> getCells() {
         List<Cell> res = new ArrayList<>();
         int[] dx = {-1, 0, 1, 0}, dy = {0, 1, 0, -1};
@@ -52,6 +57,7 @@ public class Player {
             x += dx[d];
             y += dy[d];
             res.add(new Cell(x, y));
+            // 重新计算出所有的节点
             if (!checkTailIncreasing(++ step)) {   // 这里是不增加长度时才要移除尾巴
                 res.remove(0);
             }

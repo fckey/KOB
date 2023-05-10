@@ -6,6 +6,8 @@ import com.kob.backend.consumer.utils.JwtAuthenticationUtil;
 import com.kob.backend.mapper.RecordMapper;
 import com.kob.backend.mapper.UserMapper;
 import com.kob.backend.pojo.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -21,30 +23,37 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * @description: websocket的连接处理
- * @author: fangshaolei
- * @time: 2023/3/20 9:23
- */
+ * @version 1.0
+ * @program: backendcloud
+ * @classname WebSocketServer
+ * @description: WebSocket的连接处理，每次出现一个新的连接，系统都会创建当前这个类的实例
+ * @author: Jeff Fong
+ * @create: 2023/05/10 17:18
+ **/
 @Component
 @ServerEndpoint("/websocket/{token}")  // 注意不要以'/'结尾
 public class WebSocketServer {
-    final public static ConcurrentHashMap<Integer, WebSocketServer> users = new ConcurrentHashMap<>(); // 存储所有的链接
+    private static final Logger log = LoggerFactory.getLogger(WebSocketServer.class);
+    // 存储目前还在系统中的用户对应的WebSocket链接，需要使用静态的并发的Map来存储，防止并发问题，静态是每次来新的连接都会创建实例
+    public static final ConcurrentHashMap<Integer, WebSocketServer> userPool = new ConcurrentHashMap<>();
+    // 与某个客户端的连接会话，需要通过它来给客户端发送数据
     private Session session = null;
-    private User user;
+    // 当前和服务端通信的用户
+    private User user = null;
 
     // 注入数据库操作
     private static UserMapper userMapper;
     public static RecordMapper recordMapper;
 
+    // 用作服务调用的类
     public static RestTemplate restTemplate;
 
+    // 得到创建的地图
     private Game game = null;
     private final static String addPlayerUrl = "http://127.0.0.1:9001/player/add/";
     private final static String removePlayerUrl = "http://127.0.0.1:9001/player/remove/";
     @Autowired
-    public void setUserMapper(UserMapper userMapper){
-        WebSocketServer.userMapper = userMapper;
-    }
+    public void setUserMapper(UserMapper userMapper){WebSocketServer.userMapper = userMapper;}
     @Autowired
     public void setRecordMapper(RecordMapper recordMapper){
         WebSocketServer.recordMapper = recordMapper;
@@ -53,122 +62,166 @@ public class WebSocketServer {
     public void setRestTemplate(RestTemplate restTemplate){
         WebSocketServer.restTemplate = restTemplate;
     }
-
+    
+    /**
+     * @author Jeff Fong
+     * @description WebSocket连接成功建立后回调函数，作初始化方法和发送数据
+     * @date 2023/5/10 17:00
+     * @param: session 上下文
+     * @param: token WebSocket建立发送的参数
+     * @return void
+     **/
     @OnOpen
     public void onOpen(Session session, @PathParam("token") String token) throws IOException {
-        // 建立连接
+        // 1. 客户端建立连接
         this.session = session;
-        System.out.println("connected ! ");
+        // 2. 获取用户的信息
         Integer userId = JwtAuthenticationUtil.getUserId(token);
         this.user = userMapper.selectById(userId);
+        log.info("{} connected server ..... ", user.toString());
+        // 将
         if(this.user != null){
-            users.put(userId, this); // 所有对象放到map中
+            userPool.put(userId, this); // 所有对象放到map中
         }else{
             this.session.close();
         }
-
-        System.out.println(users);
+        log.info("the current userPool is {}", userPool);
     }
 
+    /**
+     * @author Jeff Fong
+     * @description WebSocket断开连接后的回调函数
+     * @date 2023/5/10 17:03
+     * @param:
+     * @return void
+     **/
     @OnClose
     public void onClose() {
         // 关闭链接
-        System.out.println("disconnnected");
+        log.info("{} disconnected ..... ", user.toString());
         if(this.user != null){
-            users.remove(this.user.getId());
+            userPool.remove(this.user.getId());
         }
     }
 
+    /**
+     * @author Jeff Fong
+     * @description 根据方向来设置移动的方向
+     * @date 2023/5/10 21:31
+     * @param: direction
+     * @return void
+     **/
     private void move(int direction){
-        // 判断一下当前是哪条蛇
+        // 判断当前是哪条蛇
         if(game.getPlayerA().getId().equals(user.getId())){
+            // 设置a的方向值
             game.setNextStepA(direction);
         }else if(game.getPlayerB().getId().equals(user.getId())){
+            // 设置b的方向值
             game.setNextStepB(direction);
         }
     }
+
+    /**
+     * @author Jeff Fong
+     * @description 从客户端接受到消息的回调函数，写处理消息的逻辑
+     * @date 2023/5/10 17:04
+     * @param: message
+     * @param: session
+     * @return void
+     **/
     @OnMessage
     public void onMessage(String message, Session session) {
         // 从Client接收消息
-        System.out.println("receive message : " + message);
+        log.info("{} receive message : {}", user.toString(), message);
+        // 将前端的信息解析出来
         JSONObject data = JSONObject.parseObject(message);
+        // 判断匹配的状态
         String event = data.getString("event");
         if("start-matching".equals(event)){
             startMatching();
         }else if("stop-matching".equals(event)){
             stopMatching();
         }else if("move".equals(event)){
-            System.out.println(event);
+            log.info("当前前端发送过来的是{}", event);
             move(data.getInteger("direction"));
         }
     }
 
     public static void startGame(Integer aId, Integer bId){
         User a = userMapper.selectById(aId), b = userMapper.selectById(bId);
-        Game game = new Game(14, 13, 16, a.getId(), b.getId());
+        Game game = new Game(13, 14, 20, a.getId(), b.getId());
         game.createMap();
-        if(users.get(a.getId()) != null){
-            users.get(a.getId()).game = game;
+        if(userPool.get(a.getId()) != null){
+            userPool.get(a.getId()).game = game;
         }
-        if(users.get(b.getId()) != null){
-            users.get(b.getId()).game = game;
+        if(userPool.get(b.getId()) != null){
+            userPool.get(b.getId()).game = game;
         }
-        game.start(); // 开启一个新的线程
+        // 对游戏开启一个新的线程来处理地图的同步问题
+        game.start();
 
         JSONObject respA = new JSONObject();
         respA.put("event", "start-matching");
         respA.put("opponent_username", b.getUserName());
         respA.put("opponent_avatar", b.getAvatar());
         respA.put("game", game);
-        if(users.get(a.getId()) != null){
-            users.get(a.getId()).sendMessage(respA.toJSONString());
+        if(userPool.get(a.getId()) != null){
+            userPool.get(a.getId()).sendMessage(respA.toJSONString());
         }
         JSONObject respB = new JSONObject();
         respB.put("event", "start-matching");
         respB.put("opponent_username", a.getUserName());
         respB.put("opponent_avatar", a.getAvatar());
         respB.put("game", game);
-        if(users.get(b.getId()) != null){
-            users.get(b.getId()).sendMessage(respB.toJSONString());
+        if(userPool.get(b.getId()) != null){
+            userPool.get(b.getId()).sendMessage(respB.toJSONString());
         }
     }
 
     private void startMatching(){
-        System.out.println("start matching");
+        log.info("start matching ..... ");
         MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
         data.add("user_id", this.user.getId().toString());
         data.add("rating", this.user.getRating().toString());
-        // 第三个参数是返回的类型
+        // 开始匹配之后，将需要匹配的参数信息发送给匹配系统
         restTemplate.postForObject(addPlayerUrl, data, String.class);
     }
 
 
     private void stopMatching(){
-        System.out.println("stop matching");
+        log.info("stop matching ..... ");
         MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
         data.add("user_id", this.user.getId().toString());
+        // 将停止匹配的消息发送给匹配系统
         restTemplate.postForObject(removePlayerUrl, data, String.class);
     }
 
+    /**
+     * @author Jeff Fong
+     * @description WebSocket连接过程中发生错误的回调函数
+     * @date 2023/5/10 17:05
+     * @param: session
+     * @param: error
+     * @return void
+     **/
     @OnError
     public void onError(Session session, Throwable error) {
         error.printStackTrace();
     }
     
     /**
-     * @description: 发送消息
+     * @description: 后端向前端发送信息
      * @param message
      * @return: void
      * @author: fangshaolei
      * @time: 2023/3/20 9:41
      */
     public void sendMessage(String message){
-        synchronized (this.session){
-            try{
-                this.session.getBasicRemote().sendText(message);
-            }catch (IOException e){
-                e.printStackTrace();
-            }
+        try {
+            this.session.getBasicRemote().sendText(message);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

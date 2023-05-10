@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * @description: 蛇的身体的雷
+ * @description: 蛇的身体
  * @author: fangshaolei
  * @time: 2023/3/21 13:49
  */

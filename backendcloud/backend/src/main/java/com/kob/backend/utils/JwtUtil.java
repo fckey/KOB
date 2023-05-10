@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.UUID;
 
 /**
- * @description: jwt的工具类进行加密操作
+ * @description: Jwt工具类进行加密操作
  * @author: fangshaolei
  * @time: 2023/3/16 20:08
  */

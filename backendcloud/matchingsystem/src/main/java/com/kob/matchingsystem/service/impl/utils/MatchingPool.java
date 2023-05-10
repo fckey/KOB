@@ -1,5 +1,7 @@
 package com.kob.matchingsystem.service.impl.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -17,9 +19,9 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 @Component
 public class MatchingPool extends Thread{
+    private static final Logger log = LoggerFactory.getLogger(MatchingPool.class);
     private static List<Player> players = new ArrayList<>();
     private ReentrantLock lock = new ReentrantLock();
-
     private static RestTemplate restTemplate;
     private final static String startGameUrl = "http://127.0.0.1:9000/pk/start/game/";
 
@@ -88,7 +90,7 @@ public class MatchingPool extends Thread{
      * @time: 2023/3/25 12:01
      */
     private void sendResult(Player a, Player b){
-        System.out.println("send result : " + a + " " + b);
+        log.info("send result : {} and {}", a, b);
         MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
         data.add("a_id", a.getUserId().toString());
         data.add("b_id", b.getUserId().toString());
@@ -103,7 +105,7 @@ public class MatchingPool extends Thread{
      * @time: 2023/3/25 11:53
      */
     private void matchingPlayers(){
-        System.out.println("matching player : " + players.toString());
+        log.info("matching player -------- {}", players.toString() );
         boolean[] used = new boolean[players.size()]; // 表示的是哪些玩家已经匹配过了
         // 表示的是最先加入到队列中的玩家会有更高的优先级来进行匹配
         for(int i = 0;i < players.size(); i ++){

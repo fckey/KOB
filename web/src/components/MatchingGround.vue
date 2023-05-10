@@ -1,3 +1,4 @@
+
 <template>
     <div class="matchground">
         <div class="row">
@@ -31,15 +32,17 @@ export default{
     setup(){
         const store = useStore();
         let match_btn_info = ref('开始匹配');
-
+        // 创建更换按钮样式函数
         const click_match_btn = () => {
             if(match_btn_info.value === '开始匹配'){
-                match_btn_info.value = '取消匹配';  
+                match_btn_info.value = '取消匹配'; 
+                // 向后端发送请求 
                 store.state.pk.socket.send(JSON.stringify({
                     event: 'start-matching',
                 }))
             }else{
                 match_btn_info.value = '开始匹配';
+                // 向后端发送停止匹配的信号
                 store.state.pk.socket.send(JSON.stringify({
                     event: 'stop-matching',
                 }))
