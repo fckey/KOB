@@ -94,10 +94,14 @@
                                                         </div>
                                                         <div class="mb-3">
                                                             <label for="add-bot-code" class="form-label">Bot代码</label>
-                                                            <VAceEditor v-model:value="bot.content" @init="editorInit"
-                                                                lang="c_cpp" theme="textmate" style="height: 300px" />
-                                                        </div>
+                                                            <VAceEditor
+                                                            v-model:value="bot.content"
+                                                            @init="editorInit"
+                                                            lang="c_cpp"
+                                                            theme="textmate"
+                                                            style="height: 300px" />
                                                     </div>
+                                                                                                        </div>
                                                     <div class="modal-footer">
                                                         <div class="error-message">{{ bot.error_message }}</div>
                                                         <button type="button" class="btn btn-primary"

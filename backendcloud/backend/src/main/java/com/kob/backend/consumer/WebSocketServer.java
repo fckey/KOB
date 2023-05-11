@@ -52,7 +52,7 @@ public class WebSocketServer {
     public static RestTemplate restTemplate;
 
     // 得到创建的地图
-    private Game game = null;
+    public Game game = null;
     private final static String addPlayerUrl = "http://127.0.0.1:9001/player/add/";
     private final static String removePlayerUrl = "http://127.0.0.1:9001/player/remove/";
     @Autowired

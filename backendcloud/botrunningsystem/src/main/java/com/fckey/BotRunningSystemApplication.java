@@ -1,5 +1,6 @@
 package com.fckey;
 
+import com.fckey.service.impl.BotRunningServiceImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -14,6 +15,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class BotRunningSystemApplication {
     public static void main(String[] args) {
+        // 启动一个线程
+        BotRunningServiceImpl.botPool.start();
         SpringApplication.run(BotRunningSystemApplication.class, args);
     }
 }

@@ -1,6 +1,7 @@
 package com.fckey.service.impl;
 
 import com.fckey.service.BotRunningService;
+import com.fckey.service.impl.utils.BootPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class BotRunningServiceImpl implements BotRunningService {
     private static final Logger log = LoggerFactory.getLogger(BotRunningServiceImpl.class);
+    public static final BootPool botPool = new BootPool();
     /** 
      * @author Jeff Fong
      * @description 添加bot代码
@@ -28,6 +30,7 @@ public class BotRunningServiceImpl implements BotRunningService {
     @Override
     public String addBot(Integer userId, String botCode, String input) {
         log.info("add bot user id = {}, bot code = {} , input = {}", userId, botCode, input);
+        botPool.produce(userId, botCode, input);
         return "add bot success";
     }
 }
