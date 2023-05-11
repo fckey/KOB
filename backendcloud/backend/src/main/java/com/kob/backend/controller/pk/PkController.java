@@ -35,9 +35,11 @@ public class PkController {
     @PostMapping("/pk/start/game")
     public String startGame(@RequestParam MultiValueMap<String, String> data){
         Integer aId = Integer.parseInt(Objects.requireNonNull(data.getFirst("a_id")));
+        Integer aBotId = Integer.parseInt(Objects.requireNonNull(data.getFirst("a_bot_id")));
         Integer bId = Integer.parseInt(Objects.requireNonNull(data.getFirst("b_id")));
+        Integer bBotId = Integer.parseInt(Objects.requireNonNull(data.getFirst("b_bot_id")));
 
         log.info("匹配系统回传匹配成功数据，匹配成功的用户id是{} 和 {}", aId, bId);
-        return pkService.startGame(aId, bId);
+        return pkService.startGame(aId, aBotId, bId, bBotId);
     }
 }

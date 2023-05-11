@@ -2,8 +2,13 @@ package com.kob.backend.consumer.utils;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.kob.backend.consumer.WebSocketServer;
+import com.kob.backend.pojo.Bot;
 import com.kob.backend.pojo.Record;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,6 +24,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 @Data
 public class Game extends Thread{
+
+    private static final Logger log = LoggerFactory.getLogger(Game.class);
      // 游戏中行的数量
      private final Integer rows;
      // 游戏中列的数量
@@ -40,6 +47,7 @@ public class Game extends Thread{
 
     private String status = "playing"; // playing -> finished
     private String loser = ""; // all: 平局 a: a输 b:b输
+    private final static String addBotUrl = "http://127.0.0.1:9002/bot/add/";
 
     /**
      * @author Jeff Fong
@@ -75,13 +83,34 @@ public class Game extends Thread{
          }
      }
 
-    public Game(Integer rows, Integer cols, Integer innerWallsCount, Integer idA, Integer idB){
+    public Game(
+            Integer rows,
+            Integer cols,
+            Integer innerWallsCount,
+            Integer idA,
+            Bot botA,
+            Integer idB,
+            Bot botB
+    ){
         this.rows = rows;
         this.cols = cols;
         this.innerWallsCount = innerWallsCount;
         this.map = new Integer[rows][cols];
-        playerA = new Player(idA, rows - 2, 1, new ArrayList<>());
-        playerB = new Player(idB, 1, cols - 2, new ArrayList<>());
+
+        Integer botIdA = -1, botIdB = -1;
+        String botCodeA = "", botCodeB = "";
+        if(botA != null){
+            botIdA = botA.getId();
+            botCodeA = botA.getContent();
+        }
+
+        if(botB != null){
+            botIdB = botB.getId();
+            botCodeB = botB.getContent();
+        }
+
+        playerA = new Player(botIdA, botCodeA, idA, rows - 2, 1, new ArrayList<>());
+        playerB = new Player(botIdB, botCodeB, idB, 1, cols - 2, new ArrayList<>());
     }
 
     /**
@@ -183,6 +212,48 @@ public class Game extends Thread{
     
     /**
      * @author Jeff Fong
+     * @description 将当前的局面信息编码成一个字符串
+     * @date 2023/5/11 16:46
+     * @param: player
+     * @return java.lang.String
+     **/
+    private String getInput(Player player){
+        Player me, you;
+        if(playerA.getId().equals(player.getId())) {
+            me = playerA;
+            you = playerB;
+        } else{
+            me = playerB;
+            you = playerA;
+        }
+
+        return getMapString() + "#" +
+                me.getSx() + "#" +
+                me.getSy() + "#(" +
+                me.getStepsString() + ")#" +
+                you.getSx() + "#" +
+                you.getSy() + "#(" +
+                you.getStepsString() + ")";
+    }
+    /**
+     * @author Jeff Fong
+     * @description 向代码botrunningsystem发送信息
+     * @date 2023/5/11 16:41
+     * @param: player
+     * @return void
+     **/
+    private void sendBotCode(Player player){
+        if(player.getBotId().equals(-1)) return; // 说明是亲自出马，是不需要bot来执行下一步的操作
+        MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
+        data.add("user_id", player.getId().toString());
+        data.add("bot_code", player.getBotCode());
+        data.add("input", getInput(player));
+
+        WebSocketServer.restTemplate.postForObject(addBotUrl, data, String.class);
+    }
+
+    /**
+     * @author Jeff Fong
      * @description 等待两个玩家的下一步操作
      * @date 2023/5/10 20:29
      * @param: 
@@ -191,6 +262,9 @@ public class Game extends Thread{
     private boolean nextStep(){
         // 这里的操作是为了前端能够有最小的时间去渲染
         try {TimeUnit.MILLISECONDS.sleep(200);} catch (InterruptedException e) {throw new RuntimeException(e);}
+
+        sendBotCode(playerA);
+        sendBotCode(playerB);
 
         for (int i = 0; i < 50; i++) {
             try {
@@ -364,6 +438,8 @@ public class Game extends Thread{
     private void judge(){ // 判断两名玩家的下一步操作是否是合法的
         List<Cell> cellsA = playerA.getCells();
         List<Cell> cellsB = playerB.getCells();
+        log.info("the cells A is {} ", cellsA);
+        log.info("the cells B is {}", cellsB);
         // 分别判断a和b是否是合法的
         boolean validA =  check_valid(cellsA, cellsB);
         boolean validB = check_valid(cellsB, cellsA);

@@ -14,5 +14,5 @@ public interface PkService {
      * @author: fangshaolei
      * @time: 2023/3/25 14:04
      */
-    String startGame(Integer a, Integer b);
+    String startGame(Integer a,Integer aBotId, Integer b, Integer bBotId);
 }

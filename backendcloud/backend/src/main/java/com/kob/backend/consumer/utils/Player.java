@@ -3,6 +3,8 @@ package com.kob.backend.consumer.utils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Player {
+    private static final Logger log = LoggerFactory.getLogger(Player.class);
+    private Integer botId;  // -1 代表的是人工操作， 否则表示用ai来进行对战
+    private String botCode;
     // 当前玩家的id
     private Integer id;
     // 当前玩家的x坐标
@@ -30,13 +35,13 @@ public class Player {
 
     /**
      * @author Jeff Fong
-     * @description 动态的判断当前回合蛇的长度是否应该增加
+     * @description 动态的判断当前回合蛇的长度是否应该增加,true表示增加
      * @date 2023/5/10 21:47
      * @param: steps
      * @return boolean
      **/
     private boolean checkTailIncreasing(int steps){ // 检验当前回合，蛇的长度是否增加
-        if(steps <= 10) return false;
+        if(steps <= 10) return true;
         return steps % 3 == 1;
     }
 

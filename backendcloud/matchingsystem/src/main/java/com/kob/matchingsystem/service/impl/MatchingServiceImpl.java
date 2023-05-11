@@ -15,18 +15,20 @@ import org.springframework.stereotype.Service;
 public class MatchingServiceImpl implements MatchingService {
     private static final Logger log = LoggerFactory.getLogger(MatchingServiceImpl.class);
     public final static MatchingPool matchingPool = new MatchingPool(); // 定义一个全局的线程类
+
     /**
-     * @description: 添加玩家
-     * @param userId
-     * @param rating
-     * @return: java.lang.String
-     * @author: fangshaolei
-     * @time: 2023/3/22 21:12
-     */
+     * @author Jeff Fong
+     * @description 添加玩家
+     * @date 2023/5/11 16:13
+     * @param: userId
+     * @param: rating
+     * @param: botId
+     * @return java.lang.String
+     **/
     @Override
-    public String addPlayer(Integer userId, Integer rating) {
+    public String addPlayer(Integer userId, Integer rating, Integer botId) {
         log.info("add player userid = {}, and rating = {}", userId, rating);
-        matchingPool.addPlayer(userId, rating);
+        matchingPool.addPlayer(userId, rating, botId);
         return "add player success";
     }
     

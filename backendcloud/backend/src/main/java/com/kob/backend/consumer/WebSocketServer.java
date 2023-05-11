@@ -3,8 +3,10 @@ package com.kob.backend.consumer;
 import com.alibaba.fastjson2.JSONObject;
 import com.kob.backend.consumer.utils.Game;
 import com.kob.backend.consumer.utils.JwtAuthenticationUtil;
+import com.kob.backend.mapper.BotMapper;
 import com.kob.backend.mapper.RecordMapper;
 import com.kob.backend.mapper.UserMapper;
+import com.kob.backend.pojo.Bot;
 import com.kob.backend.pojo.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +46,7 @@ public class WebSocketServer {
     // 注入数据库操作
     private static UserMapper userMapper;
     public static RecordMapper recordMapper;
+    public static BotMapper botMapper;
 
     // 用作服务调用的类
     public static RestTemplate restTemplate;
@@ -58,6 +61,8 @@ public class WebSocketServer {
     public void setRecordMapper(RecordMapper recordMapper){
         WebSocketServer.recordMapper = recordMapper;
     }
+    @Autowired
+    public void setBotMapper(BotMapper botMapper) {WebSocketServer.botMapper = botMapper;}
     @Autowired
     public void setRestTemplate(RestTemplate restTemplate){
         WebSocketServer.restTemplate = restTemplate;
@@ -114,11 +119,17 @@ public class WebSocketServer {
     private void move(int direction){
         // 判断当前是哪条蛇
         if(game.getPlayerA().getId().equals(user.getId())){
-            // 设置a的方向值
-            game.setNextStepA(direction);
+            if(game.getPlayerA().getBotId() != null &&
+                    "-1".equals(game.getPlayerA().getBotId().toString())){ // 自己人工操作走的流程
+                // 设置a的方向值
+                game.setNextStepA(direction);
+            }
         }else if(game.getPlayerB().getId().equals(user.getId())){
-            // 设置b的方向值
-            game.setNextStepB(direction);
+            if(game.getPlayerB().getBotId() != null &&
+                    "-1".equals(game.getPlayerB().getBotId().toString())){ // 自己人工操作走的流程
+                // 设置b的方向值
+                game.setNextStepB(direction);
+            }
         }
     }
 
@@ -139,7 +150,8 @@ public class WebSocketServer {
         // 判断匹配的状态
         String event = data.getString("event");
         if("start-matching".equals(event)){
-            startMatching();
+            // 将前端传过来的bot_id放到后面去
+            startMatching(data.getInteger("bot_id"));
         }else if("stop-matching".equals(event)){
             stopMatching();
         }else if("move".equals(event)){
@@ -157,9 +169,18 @@ public class WebSocketServer {
      * @param: bId
      * @return void
      **/
-    public static void startGame(Integer aId, Integer bId){
+    public static void startGame(Integer aId, Integer aBotId, Integer bId, Integer bBotId){
         User a = userMapper.selectById(aId), b = userMapper.selectById(bId);
-        Game game = new Game(13, 14, 20, a.getId(), b.getId());
+        Bot botA = botMapper.selectById(aBotId), botB = botMapper.selectById(bBotId);
+
+        Game game = new Game(
+                13,
+                14,
+                20,
+                a.getId(),
+                botA,
+                b.getId(),
+                botB);
         game.createMap();
         if(userPool.get(a.getId()) != null){
             userPool.get(a.getId()).game = game;
@@ -203,17 +224,18 @@ public class WebSocketServer {
     /**
      * @author Jeff Fong
      * @description 开始匹配游戏，需要通过匹配系统来实现
-     * @date 2023/5/11 09:32
-     * @param:
+     * @date 2023/5/11 15:49
+     * @param: botId 前端穿过来要对战的botid
      * @return void
      **/
-    private void startMatching(){
+    private void startMatching(Integer botId){
         log.info("start matching ..... ");
         MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
         // 需要用户的id
         data.add("user_id", this.user.getId().toString());
         // 当前用户的积分是多少
         data.add("rating", this.user.getRating().toString());
+        data.add("bot_id", botId.toString());
         // 开始匹配之后，将需要匹配的参数信息发送给匹配系统
         restTemplate.postForObject(addPlayerUrl, data, String.class);
     }

@@ -1,9 +1,7 @@
 <template>
   <nav class="navbar navbar-expand-lg bg-body-tertiary navbar-dark bg-dark">
     <div class="container">
-      <router-link class="navbar-brand" :to="{ name: 'home' }"
-        >King of Bots</router-link
-      >
+      <router-link class="navbar-brand" :to="{ name: 'home' }">King of Bots</router-link>
       <div class="collapse navbar-collapse" id="navbarText">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
@@ -16,18 +14,14 @@
           </li>
           <li class="nav-item">
             <router-link
-              :class="
-                route_name == 'record_index' ? 'nav-link active' : 'nav-link'
-              "
+              :class="route_name == 'record_index' ? 'nav-link active' : 'nav-link'"
               :to="{ name: 'record_index' }"
               >对局列表</router-link
             >
           </li>
           <li class="nav-item">
             <router-link
-              :class="
-                route_name == 'ranklist_index' ? 'nav-link active' : 'nav-link'
-              "
+              :class="route_name == 'ranklist_index' ? 'nav-link active' : 'nav-link'"
               :to="{ name: 'ranklist_index' }"
               >排行榜</router-link
             >
@@ -42,13 +36,16 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              {{ $store.state.user.username }}
+              <div class="user-avatar">
+                <img :src="$store.state.user.avatar" alt="" />
+              </div>
+              <span>
+                {{ $store.state.user.username }}
+              </span>
             </a>
             <ul class="dropdown-menu">
               <li>
-                <router-link
-                  class="dropdown-item"
-                  :to="{ name: 'user_bot_index' }"
+                <router-link class="dropdown-item" :to="{ name: 'user_bot_index' }"
                   >我的Bot</router-link
                 >
               </li>
@@ -104,4 +101,15 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+div.user-avatar {
+  text-align: center;
+  padding-right: 1vh;
+  display: inline;
+}
+
+div.user-avatar > img {
+  border-radius: 50%;
+  width: 4vh;
+}
+</style>
