@@ -22,13 +22,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    
     /**
-     * @description: 配置security中的操作
-     * @param http
-     * @return: void
-     * @author: fangshaolei
-     * @time: 2023/3/16 20:17
-     */
+     * @author Jeff Fong
+     * @description 限制只能是当前系统才可以进行访问
+     * @date 2023/5/11 09:26
+     * @param: http
+     * @return void
+     **/
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()

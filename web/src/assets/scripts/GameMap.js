@@ -23,10 +23,10 @@ export class GameMap extends AcGameObject{
         this.store = store;
         this.L = 0; // 每个格子的绝对距离
 
-        this.rows = store.state.pk.game.rows;
-        this.cols = store.state.pk.game.cols;
+        this.rows = 13;
+        this.cols = 14;
 
-        this.inner_walls_count = store.state.pk.game.innerWallsCount; // 表示对于对局内部的障碍物
+        this.inner_walls_count = 20; // 表示对于对局内部的障碍物
 
         this.walls  = []; // 存储所有的墙
 
@@ -39,7 +39,7 @@ export class GameMap extends AcGameObject{
      * 创建墙
      */
     create_walls(){
-        const g = this.store.state.pk.game.map;
+        const g = this.store.state.pk.gamemap;
         // 画图
         for(let r = 0; r < this.rows; r ++){
             for(let c = 0; c < this.cols; c ++){

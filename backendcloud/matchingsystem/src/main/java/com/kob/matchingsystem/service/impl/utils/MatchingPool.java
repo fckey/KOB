@@ -19,7 +19,9 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 @Component
 public class MatchingPool extends Thread{
+
     private static final Logger log = LoggerFactory.getLogger(MatchingPool.class);
+    // 记录当前所有正在匹配的用户
     private static List<Player> players = new ArrayList<>();
     private ReentrantLock lock = new ReentrantLock();
     private static RestTemplate restTemplate;
@@ -30,6 +32,15 @@ public class MatchingPool extends Thread{
         MatchingPool.restTemplate = restTemplate;
     }
 
+
+    /**
+     * @author Jeff Fong
+     * @description 添加一个用户
+     * @date 2023/5/11 10:01
+     * @param: userId
+     * @param: rating
+     * @return void
+     **/
     public void addPlayer(Integer userId, Integer rating){
         lock.lock();
         try{
@@ -40,6 +51,13 @@ public class MatchingPool extends Thread{
         }
     }
 
+    /**
+     * @author Jeff Fong
+     * @description 删除一名玩家
+     * @date 2023/5/11 10:02
+     * @param: userId
+     * @return void
+     **/
     public void removePlayer(Integer userId){
         lock.lock();
         try{
@@ -82,7 +100,7 @@ public class MatchingPool extends Thread{
     }
     
     /**
-     * @description: 返回a和b的匹配结果
+     * @description: 返回a和b的匹配结果,直接开始游戏
      * @param a
      * @param b
      * @return: void
@@ -105,7 +123,7 @@ public class MatchingPool extends Thread{
      * @time: 2023/3/25 11:53
      */
     private void matchingPlayers(){
-        log.info("matching player -------- {}", players.toString() );
+        log.info("match players : {}", players.toString());
         boolean[] used = new boolean[players.size()]; // 表示的是哪些玩家已经匹配过了
         // 表示的是最先加入到队列中的玩家会有更高的优先级来进行匹配
         for(int i = 0;i < players.size(); i ++){
@@ -117,6 +135,7 @@ public class MatchingPool extends Thread{
                 // 判断两个是否可以进行匹配
                 if(checkMatched(a,b)){
                     used[i] = used[j] = true; // 表示已经用过了
+                    log.info("matching player -------- {} and {} success .......", a, b);
                     sendResult(a, b);
                     break;
                 }
@@ -138,7 +157,8 @@ public class MatchingPool extends Thread{
                 Thread.sleep(1000);
                 lock.lock();
                 try{
-                    increasingWaitingTime(); // 所有玩家等待1s之后，时间就会自动的加上1
+                    // 所有玩家等待1s之后，时间就会自动的加上1
+                    increasingWaitingTime();
                     matchingPlayers();
                 }finally{
                     lock.unlock();

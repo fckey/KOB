@@ -4,14 +4,20 @@ export default{
         socket: null, // 当前的socket连接 
         opponent_username: '', // 对手的用户名 
         opponent_avatar: '',
-        game: '',
-        gameObject: '',
+        gamemap: '', // 同步的地图
+        a_id: 0, // a的id
+        a_sx: 0,
+        a_sy: 0,
+        b_id: 0, // b的id
+        b_sx: 0,
+        b_sy: 0,
+        gameObject: '', // 
         loser: 'none', // all ， a、b
     },
     getters: {
     },
     mutations: {
-        
+
         // 更新Socket
         updateSocket(state, socket){
             state.socket = socket;
@@ -30,7 +36,15 @@ export default{
 
         // 更新地图
         updateGame(state, game){
-            state.game = game;
+            state.gamemap = game.map;
+            state.a_id = game.a_id;
+            state.a_sx = game.a_sx;
+            state.a_sy = game.a_sy;
+            state.b_id = game.b_id;
+            state.b_sx = game.b_sx;
+            state.b_sy = game.b_sy;
+            state.rows = game.rows;
+            state.cols = game.cols;
         },
 
         // 更新游戏对象

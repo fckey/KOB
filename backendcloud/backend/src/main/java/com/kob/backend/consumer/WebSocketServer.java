@@ -144,10 +144,19 @@ public class WebSocketServer {
             stopMatching();
         }else if("move".equals(event)){
             log.info("当前前端发送过来的是{}", event);
+            // 移动
             move(data.getInteger("direction"));
         }
     }
 
+    /**
+     * @author Jeff Fong
+     * @description 开始游戏，进行地图的创建和响应客户端
+     * @date 2023/5/11 09:30
+     * @param: aId
+     * @param: bId
+     * @return void
+     **/
     public static void startGame(Integer aId, Integer bId){
         User a = userMapper.selectById(aId), b = userMapper.selectById(bId);
         Game game = new Game(13, 14, 20, a.getId(), b.getId());
@@ -160,12 +169,24 @@ public class WebSocketServer {
         }
         // 对游戏开启一个新的线程来处理地图的同步问题
         game.start();
+        // 将a,b的坐标和地图发送给前端，进行同步
+        JSONObject respGame = new JSONObject();
+        respGame.put("a_id", game.getPlayerA().getId());
+        respGame.put("a_sx", game.getPlayerA().getSx());
+        respGame.put("a_sy", game.getPlayerA().getSy());
+        respGame.put("b_id", game.getPlayerB().getId());
+        respGame.put("b_sx", game.getPlayerB().getSx());
+        respGame.put("b_sy", game.getPlayerB().getSy());
+        respGame.put("rows", game.getRows());
+        respGame.put("cols", game.getCols());
+        respGame.put("innerwallcount", game.getInnerWallsCount());
+        respGame.put("map", game.getMap());
 
         JSONObject respA = new JSONObject();
         respA.put("event", "start-matching");
         respA.put("opponent_username", b.getUserName());
         respA.put("opponent_avatar", b.getAvatar());
-        respA.put("game", game);
+        respA.put("game", respGame);
         if(userPool.get(a.getId()) != null){
             userPool.get(a.getId()).sendMessage(respA.toJSONString());
         }
@@ -173,22 +194,37 @@ public class WebSocketServer {
         respB.put("event", "start-matching");
         respB.put("opponent_username", a.getUserName());
         respB.put("opponent_avatar", a.getAvatar());
-        respB.put("game", game);
+        respB.put("game", respGame);
         if(userPool.get(b.getId()) != null){
             userPool.get(b.getId()).sendMessage(respB.toJSONString());
         }
     }
 
+    /**
+     * @author Jeff Fong
+     * @description 开始匹配游戏，需要通过匹配系统来实现
+     * @date 2023/5/11 09:32
+     * @param:
+     * @return void
+     **/
     private void startMatching(){
         log.info("start matching ..... ");
         MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
+        // 需要用户的id
         data.add("user_id", this.user.getId().toString());
+        // 当前用户的积分是多少
         data.add("rating", this.user.getRating().toString());
         // 开始匹配之后，将需要匹配的参数信息发送给匹配系统
         restTemplate.postForObject(addPlayerUrl, data, String.class);
     }
 
-
+    /**
+     * @author Jeff Fong
+     * @description 停止匹配游戏，需要将停止匹配的消息发送给匹配系统
+     * @date 2023/5/11 09:32
+     * @param:
+     * @return void
+     **/
     private void stopMatching(){
         log.info("stop matching ..... ");
         MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
@@ -218,10 +254,12 @@ public class WebSocketServer {
      * @time: 2023/3/20 9:41
      */
     public void sendMessage(String message){
-        try {
-            this.session.getBasicRemote().sendText(message);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        synchronized (this.session){
+            try {
+                this.session.getBasicRemote().sendText(message);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

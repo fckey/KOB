@@ -2,6 +2,7 @@ package com.kob.backend.config;
 
 import com.kob.backend.filter.JwtAuthenticationTokenFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -22,9 +23,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  */
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    private final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
+    @Autowired
+    private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
     /**
      * @description: 设置密码加密操作
      * @param

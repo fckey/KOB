@@ -3,10 +3,10 @@
         <div class="result-board-text" v-if="$store.state.pk.loser === 'all'">
             平局⚒️
         </div>
-        <div class="result-board-text" v-else-if="$store.state.pk.loser === 'a' && $store.state.pk.game.playerA.id == $store.state.user.id">
+        <div class="result-board-text" v-else-if="$store.state.pk.loser === 'a' && $store.state.pk.a_id == $store.state.user.id">
             输😭
         </div>
-        <div class="result-board-text" v-else-if="$store.state.pk.loser === 'b' && $store.state.pk.game.playerB.id == $store.state.user.id">
+        <div class="result-board-text" v-else-if="$store.state.pk.loser === 'b' && $store.state.pk.b_id == $store.state.user.id">
             输😭
         </div>
         <div class="result-board-text" v-else>

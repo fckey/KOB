@@ -32,6 +32,7 @@ export default {
 
             // WebSocket连接成功建立后回调函数，作初始化方法和发送数据
             socket.onopen = () => {
+                console.log("connected !!! ")
                 store.commit('updateSocket', socket);
             }
 

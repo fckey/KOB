@@ -12,15 +12,18 @@ export default{
     getters: {
     },
     mutations: {
+        // 更新用户的信息
         updateUser(state, user){
             state.id = user.id;
             state.username = user.username;
             state.avatar = user.avatar;
             state.is_login = user.is_login;
         },
+        // 更新token
         updateToken(state, token){
             state.token = token;
         },
+        // 重制登陆状态
         logout(state){
             state.id = "";
             state.username = "";
@@ -29,6 +32,7 @@ export default{
             state.is_login = false;
             location.reload();
         },
+        // 是否从云端拉去信息
         updatePullingInfo(state, pulling_info){
             state.pulling_info = pulling_info;
         }

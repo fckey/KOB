@@ -64,7 +64,14 @@ public class Player {
         }
         return res;
     }
-
+    
+    /**
+     * @author Jeff Fong
+     * @description 获得所有步数的集合
+     * @date 2023/5/11 09:01
+     * @param: 
+     * @return java.lang.String
+     **/
     public String getStepsString(){
         StringBuilder res = new StringBuilder();
         for(int d: steps){

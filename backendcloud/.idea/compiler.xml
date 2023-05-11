@@ -14,9 +14,9 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="backend" options="-parameters" />
+      <module name="backend" options="" />
       <module name="backendcloud" options="" />
-      <module name="matchingsystem" options="-parameters" />
+      <module name="matchingsystem" options="" />
     </option>
   </component>
 </project>

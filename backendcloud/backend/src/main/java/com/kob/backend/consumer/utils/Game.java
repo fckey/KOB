@@ -379,7 +379,7 @@ public class Game extends Thread{
             }
         }
     }
-    
+
     /**
      * @author Jeff Fong
      * @description 向两个玩家发送下一步的移动信息

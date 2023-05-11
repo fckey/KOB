@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.kob.backend.pojo.Bot;
 
 /**
- * @description:
+ * @description: Bot表的Mapper
  * @author: fangshaolei
  * @time: 2023/3/19 9:39
  */
