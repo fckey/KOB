@@ -26,10 +26,8 @@
 
 有关于`playerA`和`playerB`的匹配相似度
 
+![](doc/img/3.png)
 
-$$
-Matching \quad Degree = \frac{\left| Rating_A - Rating_B\right|}{\left| Min(WaitingTime_{A}, WaitingTime_B)\right| \times factor}
-$$
 当前系统，我们另`factor = 10`, 当`Matching degree` 小于`1`的时候，说明是可以进行匹配的，否则`playerA`和`playerB`不进行匹配。
 
 # Requirements
