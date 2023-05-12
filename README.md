@@ -1,21 +1,25 @@
-# Name
-[Badges] 33 
-
-# Introduction
 
 
-# Summary
+# <img src="doc/asserts/project.png" width="80" height="80"> KOB 
 
-# Features 
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/fckey/KOB)[![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)[![Stars](https://img.shields.io/github/stars/fckey/KOB)](https://img.shields.io/github/stars/fckey/KOB)[![Forks](https://img.shields.io/github/forks/fckey/kob)](https://img.shields.io/github/forks/fckey/KOB)
+
+## 前言
+
+`KOB`项目致力于打造一套线上对战小游戏平台，采用现阶段流行技术实现。
+
+# 项目简介
+# 
+# 功能说明
 该项目的模块结构流程图如下所示：
 
 对于整个系统的匹配逻辑，考虑到匹配过程中的耗费的时间或资源问题，将匹配操作单独作为一个服务,使用`Rest`方式实现服务间通信。
 
-![](doc/img/1.png)
+![](doc/asserts/1.png)
 
 匹配成功之后，对`client`游戏过的程序执行流程图如下所示：
 
-![](doc/img/2.png)
+![](doc/asserts/2.png)
 
 整体的流程是：
 
@@ -29,32 +33,34 @@
 
 有关于`playerA`和`playerB`的匹配相似度
 
-![](doc/img/3.png)
+![](doc/asserts/3.png)
 
-当前系统，我们另`factor = 10`, 当`Matching degree` 小于`1`的时候，说明是可以进行匹配的，否则`playerA`和`playerB`不进行匹配。
+当前系统，我们令`factor = 10`, 当`Matching degree` 小于`1`的时候，说明是可以进行匹配的，否则`playerA`和`playerB`不进行匹配。
 
-# Requirements
+# 环境搭建
 
 - JDK 1.8
 - SpringCloud 
+- JDK 1.8
+- Maven latest
+- Spring Boot 2.0.4
+- Intellij IDEA
+- mysql 5.7
 
-# Configuration 
-
-# Installation 
-# Usage
-fdsa
-
-
-# Development
-# Changelog 
-# FAQ 
-# Support 
-# Dos 
-# Contact 
+# 运行 
 
 
-# Authors and acknowledgment
-Cao Jupeng
 
-# License
-Scut Srp
+# 后续计划 
+
+
+
+# 问题反馈
+
+
+
+# 联系我 
+
+
+
+# 许可证

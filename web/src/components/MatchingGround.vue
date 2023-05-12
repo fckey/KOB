@@ -61,7 +61,7 @@ export default {
         match_btn_info.value = "取消匹配👽";
         // 向后端发送请求
         store.state.pk.socket.send(
-          JSON.stringify({
+          JSON.stringify({ 
             event: "start-matching",
             bot_id: select_bot.value, // 当前选择的bot传到后端
           })
