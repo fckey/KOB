@@ -2,7 +2,7 @@
 
 # <img src="doc/asserts/project.png" width="80" height="80"> KOB 
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/fckey/KOB)[![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)[![Stars](https://img.shields.io/github/stars/fckey/KOB)](https://img.shields.io/github/stars/fckey/KOB)[![Forks](https://img.shields.io/github/forks/fckey/kob)](https://img.shields.io/github/forks/fckey/KOB)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/fckey/KOB) [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html) [![Stars](https://img.shields.io/github/stars/fckey/KOB)](https://img.shields.io/github/stars/fckey/KOB) [![Forks](https://img.shields.io/github/forks/fckey/kob)](https://img.shields.io/github/forks/fckey/KOB)
 
 ## 前言
 
