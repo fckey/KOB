@@ -107,7 +107,7 @@
                                                         <button type="button" class="btn btn-primary"
                                                             @click="update_bot(bot)">确认修改</button>
                                                         <button type="button" class="btn btn-secondary"
-                                                            @click="clear_bot_content">关闭</button>
+                                                            @click="clear_update_bot_content(bot)">关闭</button>
                                                     </div>
 
                                                 </div>
@@ -189,6 +189,9 @@ export default {
             botadd.content = '';
             Modal.getInstance('#createBot').hide(); // 关闭模态框
         }
+        const clear_update_bot_content = (bot) => {
+            Modal.getInstance('#update-bot-modal-' + bot.id).hide(); // 关闭模态框
+        }
         refresh_bots();
 
         const add_bot = () => {
@@ -267,7 +270,8 @@ export default {
             add_bot,
             clear_bot_content,
             remove_bot,
-            update_bot
+            update_bot,
+            clear_update_bot_content
         }
     }
 }

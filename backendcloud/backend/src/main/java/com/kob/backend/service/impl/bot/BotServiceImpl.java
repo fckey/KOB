@@ -1,6 +1,7 @@
 package com.kob.backend.service.impl.bot;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kob.backend.mapper.BotMapper;
 import com.kob.backend.pojo.Bot;
 import com.kob.backend.pojo.User;
@@ -27,50 +28,57 @@ public class BotServiceImpl implements BotService {
     private final BotMapper botMapper;
     @Override
     public Map<String, String> add(Map<String, String> data) {
-        UsernamePasswordAuthenticationToken authenticationToken =
-                (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl loginUser = (UserDetailsImpl) authenticationToken.getPrincipal();
-        User user = loginUser.getUser();
-        String title = data.get("title");
-        String description = data.get("description");
-        String content = data.get("content");
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            UserDetailsImpl loginUser = (UserDetailsImpl) authenticationToken.getPrincipal();
+            User user = loginUser.getUser();
+            String title = data.get("title");
+            String description = data.get("description");
+            String content = data.get("content");
 
-        Map<String, String> map = new HashMap<>();
+            Map<String, String> map = new HashMap<>();
 
-        if(title == null || title.length() == 0){
-            map.put("error_message", "标题不能为空");
+            if(title == null || title.length() == 0){
+                map.put("error_message", "标题不能为空");
+                return map;
+            }
+
+            if(title.length() > 100){
+                map.put("error_message", "标题长度不能超过100");
+                return map;
+            }
+            if(description == null || description.length() == 0){
+                description = "这个用户很懒，什么也没有写~";
+            }
+            if( description.length() > 300){
+                map.put("error_message", "bot的描述长度不能大于300");
+            }
+            if(content == null || content.length() == 0 ){
+                map.put("error_message", "代码不能为空");
+                return map;
+            }
+
+            if(content.length() > 10000){
+                map.put("error_message", "代码长度不能超过10000");
+                return map;
+            }
+
+            QueryWrapper<Bot> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("user_id", user.getId());
+            if (botMapper.selectCount(queryWrapper) >= 7) {
+                map.put("error_message", "每个用户最多创建10个bot");
+                return map;
+            }
+
+            Date now = new Date();
+            Bot bot = new Bot(null, user.getId(), title, description, content, now, now);
+            int insert = botMapper.insert(bot);
+            if(insert < 1) map.put("error_message", "插入数据失败");
+            else map.put("error_message", "success");
+
             return map;
-        }
-
-        if(title.length() > 100){
-            map.put("error_message", "标题长度不能超过100");
-            return map;
-        }
-        if(description == null || description.length() == 0){
-            description = "这个用户很懒，什么也没有写~";
-        }
-        if( description.length() > 300){
-            map.put("error_message", "bot的描述长度不能大于300");
-        }
-        if(content == null || content.length() == 0 ){
-            map.put("error_message", "代码不能为空");
-            return map;
-        }
-
-        if(content.length() > 10000){
-            map.put("error_message", "代码长度不能超过10000");
-            return map;
-        }
-
-        Date now = new Date();
-        Bot bot = new Bot(null, user.getId(), title, description, content, now, now);
-        int insert = botMapper.insert(bot);
-        if(insert < 1) map.put("error_message", "插入数据失败");
-        else map.put("error_message", "success");
-
-        return map;
     }
-    
+
     /**
      * @description: 通过指定信息删除对应的bot
      * @param data
