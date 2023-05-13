@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.kob.backend.consumer.WebSocketServer;
 import com.kob.backend.pojo.Bot;
 import com.kob.backend.pojo.Record;
+import com.kob.backend.pojo.User;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -323,6 +324,21 @@ public class Game extends Thread{
             }
         }
     }
+    
+    /**
+     * @author Jeff Fong
+     * @description 更新分数
+     * @date 2023/5/13 10:47
+     * @param: player
+     * @param: rating
+     * @return void
+     **/
+    private void updateUserRating(Player player, Integer rating){
+        User user = WebSocketServer.userMapper.selectById(player.getId());
+        user.setRating(rating);
+        // 将rating更新到user中
+        WebSocketServer.userMapper.updateById(user);
+    }
 
     /**
      * @author Jeff Fong
@@ -332,6 +348,20 @@ public class Game extends Thread{
      * @return void
      **/
     private void saveToDataBase(){
+        // 获取到a,b的积分并判断输家是谁，减去对应的积分
+        Integer ratingA = WebSocketServer.userMapper.selectById(playerA.getId()).getRating();
+        Integer ratingB = WebSocketServer.userMapper.selectById(playerB.getId()).getRating();
+        if("a".equals(loser)){
+            ratingA -= 2;
+            ratingB += 5;
+        }else{
+            ratingA += 5;
+            ratingB -=2;
+        }
+
+        updateUserRating(playerA, ratingA);
+        updateUserRating(playerB, ratingB);
+
         Record record = new Record(
                 null,
                 playerA.getId(),

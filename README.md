@@ -4,12 +4,13 @@
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/fckey/KOB) [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html) [![Stars](https://img.shields.io/github/stars/fckey/KOB)](https://img.shields.io/github/stars/fckey/KOB) [![Forks](https://img.shields.io/github/forks/fckey/kob)](https://img.shields.io/github/forks/fckey/KOB)
 
-## 前言
+# 前言
 
 `KOB`项目致力于打造一套线上对战小游戏平台，采用现阶段流行技术实现。
 
 # 项目简介
-# 
+
+
 # 功能说明
 该项目的模块结构流程图如下所示：
 

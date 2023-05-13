@@ -44,7 +44,7 @@ public class WebSocketServer {
     private User user = null;
 
     // 注入数据库操作
-    private static UserMapper userMapper;
+    public static UserMapper userMapper;
     public static RecordMapper recordMapper;
     public static BotMapper botMapper;
 
