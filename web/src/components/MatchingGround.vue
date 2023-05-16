@@ -79,7 +79,7 @@ export default {
 
      const refresh_bots = () => {
             $.ajax({
-                url: 'http://localhost:9000/user/bot/getlist/',
+                url: 'https://fangls.xyz/api/user/bot/getlist/',
                 type: 'get',
                 headers: {
                     Authorization: 'Bearer ' + store.state.user.token,

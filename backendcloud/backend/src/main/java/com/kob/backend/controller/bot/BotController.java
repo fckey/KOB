@@ -14,7 +14,7 @@ import java.util.Map;
  * @time: 2023/3/19 10:11
  */
 @RestController
-@RequestMapping("/user/bot")
+@RequestMapping("/api/user/bot")
 @RequiredArgsConstructor
 public class BotController {
     private final BotService botService;

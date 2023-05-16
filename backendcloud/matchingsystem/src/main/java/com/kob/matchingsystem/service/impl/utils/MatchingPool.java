@@ -125,7 +125,6 @@ public class MatchingPool extends Thread{
      * @time: 2023/3/25 11:53
      */
     private void matchingPlayers(){
-        log.info("match players : {}", players.toString());
         boolean[] used = new boolean[players.size()]; // 表示的是哪些玩家已经匹配过了
         // 表示的是最先加入到队列中的玩家会有更高的优先级来进行匹配
         for(int i = 0;i < players.size(); i ++){

@@ -15,7 +15,7 @@ import java.util.Map;
  * @time: 2023/3/17 9:19
  */
 @RestController
-@RequestMapping("/user/account")
+@RequestMapping("/api/user/account")
 @RequiredArgsConstructor
 public class AccountController {
     private static final Logger LOG = LogManager.getLogger(AccountController.class);

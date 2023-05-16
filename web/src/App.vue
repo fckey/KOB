@@ -14,7 +14,7 @@ export default {
   },
   setup() {
     $.ajax({
-      url: "http://localhost:9000/user/account/register/",
+      url: "https://fangls.xyz/api/user/account/register/",
       type: "post",
       data: {
         username: "fangshaodi",

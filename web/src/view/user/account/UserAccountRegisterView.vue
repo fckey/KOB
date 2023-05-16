@@ -58,7 +58,7 @@ export default {
     let error_message = ref("");
     const register = () => {
       $.ajax({
-        url: "http://localhost:9000/user/account/register/",
+        url: "https://fangls.xyz/api/user/account/register/",
         type: "post",
         data: {
           username: username.value,

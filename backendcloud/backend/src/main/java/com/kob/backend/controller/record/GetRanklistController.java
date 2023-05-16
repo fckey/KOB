@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.kob.backend.service.ranklist.GetRanklistService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,6 +19,7 @@ import java.util.Map;
  * @create: 2023/05/13 20:56
  **/
 @RestController
+@RequestMapping("/api")
 public class GetRanklistController {
     @Autowired
     private GetRanklistService getRanklistService;

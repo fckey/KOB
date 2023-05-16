@@ -1,6 +1,5 @@
 package com.fckey.service.impl.utils;
 
-import com.fckey.utils.BotInterface;
 import org.joor.Reflect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,8 +9,12 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ResourceBundle;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * @version 1.0
@@ -62,7 +65,7 @@ public class Consumer extends Thread{
      * @return java.lang.String
      **/
     private String addUid(String code, String uid){
-        int k = code.indexOf(" implements com.fckey.utils.BotInterface");
+        int k = code.indexOf(" implements java.util.function.Supplier<Integer>");
         return code.substring(0, k) + uid + code.substring(k);
 
     }
@@ -70,12 +73,21 @@ public class Consumer extends Thread{
     public void run() {
         String uid = UUID.randomUUID().toString().substring(0, 8);
         // 如果是重名的类是只会编译一次
-        BotInterface botInterface = Reflect.compile(
+        Supplier<Integer> botInterface = Reflect.compile(
                 "com.fckey.utils.Bot" + uid,
                 addUid(bot.getBotCode(), uid)
         ).create().get();
 
-        Integer direction = botInterface.nextMove(bot.getBotInput());
+        // 将内容转变成文件
+        File file = new File("input.txt");
+        try (PrintWriter fout = new PrintWriter(file)){
+            fout.println(bot.getBotInput());
+            fout.flush();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        Integer direction = botInterface.get();
         log.info("当前bot{} , 的下一步操作是: {}",bot.getUserId(), direction);
 
         MultiValueMap<String, String> data = new LinkedMultiValueMap<>();

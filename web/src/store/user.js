@@ -40,7 +40,7 @@ export default{
     actions: {
         login(context, data){
             $.ajax({
-                url: 'http://localhost:9000/user/account/token/',
+                url: 'https://fangls.xyz/api/user/account/token/',
                 type: 'post',
                 data: {
                   username: data.username,
@@ -62,7 +62,7 @@ export default{
         },
         getInfo(context, data){
             $.ajax({
-                url: 'http://localhost:9000/user/account/info/',
+                url: 'https://fangls.xyz/api/user/account/info/',
                 type: 'get',
                 headers: {
                   Authorization: 'Bearer ' + context.state.token,

@@ -86,7 +86,7 @@ export default{
         const pull_page = page => {
             current_page = page;
             $.ajax({
-                url: 'http://localhost:9000/ranklist/getlist/',
+                url: 'https://fangls.xyz/api/ranklist/getlist/',
                 data:{
                     page,
                 },
